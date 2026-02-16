@@ -1,0 +1,73 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    <Script file="Teleports.lua"/>
+
+    <Button parentKey="TeleportTab" parent="QuestMapFrame" inherits="QuestLogTabButtonTemplate" id="5" mixin="TeleportTabMixin">
+        <KeyValues>
+            <KeyValue key="displayMode" value="5" type="number"/>
+            <KeyValue key="activeAtlas" value="Raid" type="string"/>
+            <KeyValue key="inactiveAtlas" value="Raid" type="string"/>
+            <KeyValue key="tooltipText" value="Teleports" type="string"/>
+        </KeyValues>
+        <Anchors>
+            <Anchor point="TOP" relativeKey="$parent.WorldQuestTab" relativePoint="BOTTOM" x="0" y="-3"/>
+        </Anchors>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnClick method="OnClick"/>
+        </Scripts>
+    </Button>
+
+    <Frame parentKey="TeleportPanel" parentArray="ContentFrames" parent="QuestMapFrame" hidden="true" enableMouse="true" mixin="TeleportPanelMixin">
+        <KeyValues>
+            <KeyValue key="displayMode" value="5" type="number"/>
+        </KeyValues>
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.ContentsAnchor" y="-29"/>
+            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ContentsAnchor" x="-22"/>
+        </Anchors>
+        <Frames>
+            <Frame parentKey="BorderFrame" inherits="QuestLogBorderFrameTemplate"/>
+            <ScrollFrame parentKey="ScrollFrame" name="WorldQuestsScrollFrame" inherits="ScrollFrameTemplate">
+                <KeyValues>
+                    <KeyValue key="scrollBarX" value="8" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="2" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="-4" type="number"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" atlas="QuestLog-main-background" useAtlasSize="true">
+                            <Anchors>
+                                <Anchor point="TOPLEFT"/>
+                                <Anchor point="BOTTOMRIGHT"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+                <ScrollChild>
+                    <Frame parentKey="ScrollChild" inherits="VerticalLayoutFrame">
+                        <KeyValues>
+                            <KeyValue key="leftPadding" value="4" type="number"/>
+                            <KeyValue key="rightPadding" value="0" type="number"/>
+                            <KeyValue key="topPadding" value="8" type="number"/>
+                            <KeyValue key="spacing" value="2" type="number"/>
+                        </KeyValues>
+                    </Frame>
+                </ScrollChild>
+            </ScrollFrame>
+        </Frames>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="TitleText" inherits="Game15Font_Shadow" wordwrap="false" text="Teleports">
+                    <Anchors>
+                        <Anchor point="BOTTOM" relativeKey="$parent.BorderFrame" relativePoint="TOP" x="-1" y="3"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+</Ui>

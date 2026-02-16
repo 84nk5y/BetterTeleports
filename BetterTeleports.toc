@@ -1,0 +1,9 @@
+## Interface: 120000, 120001
+## Title: BetterTeleport
+## Category-enUS: Better UI
+## IconTexture: 618858
+## Notes: Easier to find teleports
+## Author: Banksy
+## RequiredDeps: Blizzard_WorldMap, BetterTracker
+
+Teleports.xml
