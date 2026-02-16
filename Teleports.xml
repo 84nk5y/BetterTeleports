@@ -2,6 +2,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
     <Script file="Teleports.lua"/>
 
+    <Frame name="HorizontalLayoutFrameTemplate" inherits="HorizontalLayoutFrame" virtual="true">
+        <KeyValues>
+            <KeyValue key="layoutIndex" value="1" type="number"/>
+        </KeyValues>
+    </Frame>
+
     <Button parentKey="TeleportTab" parent="QuestMapFrame" inherits="QuestLogTabButtonTemplate" id="5" mixin="TeleportTabMixin">
         <KeyValues>
             <KeyValue key="displayMode" value="5" type="number"/>
@@ -10,7 +16,7 @@
             <KeyValue key="tooltipText" value="Teleports" type="string"/>
         </KeyValues>
         <Anchors>
-            <Anchor point="TOP" relativeKey="$parent.WorldQuestTab" relativePoint="BOTTOM" x="0" y="-3"/>
+            <Anchor point="TOP" relativeKey="$parent.MapLegendTab" relativePoint="BOTTOM" x="0" y="-3"/>
         </Anchors>
         <Scripts>
             <OnLoad method="OnLoad"/>
@@ -28,7 +34,7 @@
         </Anchors>
         <Frames>
             <Frame parentKey="BorderFrame" inherits="QuestLogBorderFrameTemplate"/>
-            <ScrollFrame parentKey="ScrollFrame" name="WorldQuestsScrollFrame" inherits="ScrollFrameTemplate">
+            <ScrollFrame parentKey="ScrollFrame" inherits="ScrollFrameTemplate">
                 <KeyValues>
                     <KeyValue key="scrollBarX" value="8" type="number"/>
                     <KeyValue key="scrollBarTopY" value="2" type="number"/>
@@ -51,9 +57,9 @@
                 <ScrollChild>
                     <Frame parentKey="ScrollChild" inherits="VerticalLayoutFrame">
                         <KeyValues>
-                            <KeyValue key="leftPadding" value="4" type="number"/>
+                            <KeyValue key="leftPadding" value="10" type="number"/>
                             <KeyValue key="rightPadding" value="0" type="number"/>
-                            <KeyValue key="topPadding" value="8" type="number"/>
+                            <KeyValue key="topPadding" value="12" type="number"/>
                             <KeyValue key="spacing" value="2" type="number"/>
                         </KeyValues>
                     </Frame>
@@ -70,4 +76,36 @@
             </Layer>
         </Layers>
     </Frame>
+
+    <Button name="TeleportButtonTemplate" inherits="SecureActionButtonTemplate" virtual="true">
+        <Size x="40" y="40"/>
+        <KeyValues>
+            <KeyValue key="layoutIndex" value="1" type="number"/>
+        </KeyValues>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Icon">
+                    <Size x="36" y="36"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Border" x="6" y="-3"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Border" x="-3" y="4"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="1">
+                <Texture parentKey="Border" setAllPoints="true" atlas="spellbook-item-iconframe" useAtlasSize="false" texelSnappingBias="0.0" snapToPixelGrid="false"/>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="2">
+                <Texture parentKey="IconHighlight" setAllPoints="true" atlas="spellbook-item-iconframe-hover" useAtlasSize="false" hidden="true" alpha="0.25" alphaMode="ADD" texelSnappingBias="0.0" snapToPixelGrid="false"/>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawEdge="false" useParentLevel="true" hideCountdownNumbers="false">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="2" y="-2"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="-2" y="2"/>
+                </Anchors>
+            </Cooldown>
+        </Frames>
+    </Button>
 </Ui>
