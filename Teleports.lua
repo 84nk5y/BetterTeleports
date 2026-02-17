@@ -100,12 +100,14 @@ function TeleportPanelMixin:CreateCommonRows()
                 type = data.type,
                 class = data.class
             })
-        end
-        if #currentRow == self.iconsPerRow then
-            table.insert(rows, currentRow)
-            currentRow = {}
+
+            if #currentRow == self.iconsPerRow then
+                table.insert(rows, currentRow)
+                currentRow = {}
+            end
         end
     end
+
     if #currentRow > 0 then
         table.insert(rows, currentRow)
     end
@@ -114,24 +116,30 @@ function TeleportPanelMixin:CreateCommonRows()
 end
 
 function TeleportPanelMixin:CreateSeasonRows()
+    local dungeonLookup = {}
+    for _, teleports in ipairs(addonTable.TeleportsDungeon) do
+        for id, data in pairs(teleports.dungeons) do
+            dungeonLookup[id] = data
+        end
+    end
+
     local rows = {}
     local currentRow = {}
     for _, id in ipairs(addonTable.TeleportsSeason) do
-        local data = nil
-        for _, teleports in ipairs(addonTable.TeleportsDungeon) do
-            data = teleports.dungeons[id]
-            if data then
-                table.insert(currentRow, {
-                    id = id,
-                    type = data.type
-                })
+        local data = dungeonLookup[id]
+        if data then
+            table.insert(currentRow, {
+                id = id,
+                type = data.type
+            })
+
+            if #currentRow == self.iconsPerRow then
+                table.insert(rows, currentRow)
+                currentRow = {}
             end
         end
-        if #currentRow == self.iconsPerRow then
-            table.insert(rows, currentRow)
-            currentRow = {}
-        end
     end
+
     if #currentRow > 0 then
         table.insert(rows, currentRow)
     end
@@ -145,16 +153,23 @@ function TeleportPanelMixin:CreateDungeonRows()
 
         local rows = {}
         local currentRow = {}
+        local dungeonList = {}
         for id, data in pairs(teleports.dungeons) do
+            table.insert(dungeonList, {id = id, type = data.type})
+        end
+
+        for _, dungeon in ipairs(dungeonList) do
             table.insert(currentRow, {
-                id = id,
-                type = data.type
+                id = dungeon.id,
+                type = dungeon.type
             })
+
             if #currentRow == self.iconsPerRow then
                 table.insert(rows, currentRow)
                 currentRow = {}
             end
         end
+
         if #currentRow > 0 then
             table.insert(rows, currentRow)
         end
@@ -172,12 +187,14 @@ function TeleportPanelMixin:CreateRaidRows()
                 id = id,
                 type = data.type
             })
-        end
-        if #currentRow == self.iconsPerRow then
-            table.insert(rows, currentRow)
-            currentRow = {}
+
+            if #currentRow == self.iconsPerRow then
+                table.insert(rows, currentRow)
+                currentRow = {}
+            end
         end
     end
+
     if #currentRow > 0 then
         table.insert(rows, currentRow)
     end
@@ -186,24 +203,22 @@ function TeleportPanelMixin:CreateRaidRows()
 end
 
 function TeleportPanelMixin:CreateRows(rows)
-    for i, rowTeleports in ipairs(rows) do
+    for _, rowTeleports in ipairs(rows) do
         local row = self.rowPool:Acquire()
         row.layoutIndex = self.rowLayoutIndex
 
         for j, teleport in ipairs(rowTeleports) do
-            if teleport.type == addonTable.TeleportType.Spell then
+            if teleport.type == addonTable.TeleportType.Spell or teleport.type == addonTable.TeleportType.Class then
                 self:CreateSpellEntry(teleport.id, row, j)
             elseif teleport.type == addonTable.TeleportType.Toy then
                 self:CreateToyEntry(teleport.id, row, j)
-            elseif teleport.type == addonTable.TeleportType.Class then
-                self:CreateSpellEntry(teleport.id, row, j)
             end
         end
 
         row:Layout()
         row:Show()
 
-        self.rowLayoutIndex = self.rowLayoutIndex + i
+        self.rowLayoutIndex = self.rowLayoutIndex + 1
     end
 end
 
@@ -251,7 +266,18 @@ function TeleportPanelMixin:CreateToyEntry(toyID, row, layoutIndex)
     entry:Show()
 end
 
+local function SetEntryCooldown(entry)
+    local cooldownInfo = C_Spell.GetSpellCooldown(entry.spellID)
+    if cooldownInfo and cooldownInfo.startTime > 0 then
+        entry.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
+    else
+        entry.Cooldown:Clear()
+    end
+end
+
 function TeleportPanelMixin:CreateEntryHandlers(entry)
+    SetEntryCooldown(entry)
+
     entry:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetSpellByID(self.spellID)
@@ -264,15 +290,11 @@ function TeleportPanelMixin:CreateEntryHandlers(entry)
         self.IconHighlight:Hide()
     end)
 
+    entry:UnregisterEvent("SPELL_UPDATE_COOLDOWN")
     entry:RegisterEvent("SPELL_UPDATE_COOLDOWN")
     entry:SetScript("OnEvent", function(self, event, spellID)
         if spellID == self.spellID then
-            local spellInfo = C_Spell.GetSpellCooldown(spellID)
-            if spellInfo and spellInfo.startTime > 0 then
-                self.Cooldown:SetCooldown(spellInfo.startTime, spellInfo.duration)
-            else
-                self.Cooldown:Clear()
-            end
+            SetEntryCooldown(self)
         end
     end)
 end
