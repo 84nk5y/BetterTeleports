@@ -54,13 +54,13 @@ addonTable.TeleportsSeason = {
     1254400,
 }
 
-addonTable.TeleportsDungeon = {
----- Midnight (12.0)
+addonTable.TeleportsDungeonMidnight = {
     [1254572] = { type = addonTable.TeleportType.Spell }, -- Path of the Sun King (Magisters' Terrace)
     [1254559] = { type = addonTable.TeleportType.Spell }, -- Path of the Cavern (Maisara Caverns)
     [1254563] = { type = addonTable.TeleportType.Spell }, -- Path of the Ethereal (Nexus-Point Xenas)
     [1254400] = { type = addonTable.TeleportType.Spell }, -- Path of the Fallen (Windrunner Spire)
----- The War Within (11.0)
+}
+addonTable.TeleportsDungeonTheWarWithin = {
     [445417] = { type = addonTable.TeleportType.Spell }, -- Path of the Ruined City (Ara-Kara, City of Echoes)
     [445440] = { type = addonTable.TeleportType.Spell }, -- Path of the Flaming Brewery (Cinderbrew Meadery)
     [445416] = { type = addonTable.TeleportType.Spell }, -- Path of Nerubian Ascension (City of Threads)
@@ -71,7 +71,8 @@ addonTable.TeleportsDungeon = {
     [445444] = { type = addonTable.TeleportType.Spell }, -- Path of the Light's Reverence (Priory of the Sacred Flame)
     [445443] = { type = addonTable.TeleportType.Spell }, -- Path of the Fallen Stormriders (The Rookery)
     [445269] = { type = addonTable.TeleportType.Spell }, -- Path of the Corrupted Foundry (The Stonevault)
----- Dragonflight (10.0)
+}
+addonTable.TeleportsDungeonDragonflight = {
     [393273] = { type = addonTable.TeleportType.Spell }, -- Path of the Draconic Diploma (Algeth'ar Academy)
     [393279] = { type = addonTable.TeleportType.Spell }, -- Path of Arcane Secrets (The Azure Vault)
     [393267] = { type = addonTable.TeleportType.Spell }, -- Path of the Rotting Woods (Brackenhide Hollow)
@@ -81,7 +82,8 @@ addonTable.TeleportsDungeon = {
     [393262] = { type = addonTable.TeleportType.Spell }, -- Path of the Windswept Plains (The Nokhud Offensive)
     [393256] = { type = addonTable.TeleportType.Spell }, -- Path of the Clutch Defender (Ruby Life Pools)
     [393222] = { type = addonTable.TeleportType.Spell }, -- Path of the Watcher's Legacy (Uldaman: Legacy of Tyr)
----- Shadowlands (9.0)
+}
+addonTable.TeleportsDungeonShadowlands = {
     [354468] = { type = addonTable.TeleportType.Spell }, -- Path of the Scheming Loa (De Other Side)
     [354465] = { type = addonTable.TeleportType.Spell }, -- Path of the Sinful Soul (Halls of Atonement)
     [354464] = { type = addonTable.TeleportType.Spell }, -- Path of the Misty Forest (Mists of Tirna Scithe)
@@ -91,7 +93,8 @@ addonTable.TeleportsDungeon = {
     [354466] = { type = addonTable.TeleportType.Spell }, -- Path of the Ascendant (Spires of Ascension)
     [367416] = { type = addonTable.TeleportType.Spell }, -- Path of the Streetwise Merchant (Tazavesh, the Veiled Market)
     [354467] = { type = addonTable.TeleportType.Spell }, -- Path of the Undefeated (Theater of Pain)
----- Battle for Azeroth (8.0)
+}
+addonTable.TeleportsDungeonBattleForAzeroth = {
     [424187] = { type = addonTable.TeleportType.Spell }, -- Path of the Golden Tomb (Atal'Dazar)
     [410071] = { type = addonTable.TeleportType.Spell }, -- Path of the Freebooter (Freehold)
     [373274] = { type = addonTable.TeleportType.Spell }, -- Path of the Scrappy Prince (Operation: Mechagon)
@@ -99,7 +102,8 @@ addonTable.TeleportsDungeon = {
     [motherID] = { type = addonTable.TeleportType.Spell }, -- Path of the Azerite Refinery (The MOTHERLODE!!)
     [410074] = { type = addonTable.TeleportType.Spell }, -- Path of Festering Rot (The Underrot)
     [424167] = { type = addonTable.TeleportType.Spell }, -- Path of Heart's Bane (Waycrest Manor)
----- Legion (7.0)
+}
+addonTable.TeleportsDungeonLegion = {
     [424153] = { type = addonTable.TeleportType.Spell }, -- Path of Ancient Horrors (Black Rook Hold)
     [393766] = { type = addonTable.TeleportType.Spell }, -- Path of the Grand Magistrix (Court of Stars)
     [424163] = { type = addonTable.TeleportType.Spell }, -- Path of the Nightmare Lord (Darkheart Thicket)
@@ -107,7 +111,8 @@ addonTable.TeleportsDungeon = {
     [373262] = { type = addonTable.TeleportType.Spell }, -- Path of the Fallen Guardian (Karazhan)
     [410078] = { type = addonTable.TeleportType.Spell }, -- Path of the Earth-Warder (Neltharion's Lair)
     [1254551] = { type = addonTable.TeleportType.Spell }, -- Path of Dark Dereliction Seat of the Triumvirate)
----- Warlords of Draenor (6.0)
+}
+addonTable.TeleportsDungeonWarlordsOfDraenor = {
     [159897] = { type = addonTable.TeleportType.Spell }, -- Path of the Vigilant (Auchindoun)
     [159895] = { type = addonTable.TeleportType.Spell }, -- Path of the Bloodmaul (Bloodmaul Slag Mines)
     [159901] = { type = addonTable.TeleportType.Spell }, -- Path of the Verdant (The Everbloom)
@@ -117,7 +122,8 @@ addonTable.TeleportsDungeon = {
     [159898] = { type = addonTable.TeleportType.Spell }, -- Path of the Skies (Skyreach)
     [1254557] = { type = addonTable.TeleportType.Spell }, -- Path of the Crowning Pinnacle (Skyreach)
     [159902] = { type = addonTable.TeleportType.Spell }, -- Path of the Burning Mountain (Upper Blackrock Spire)
----- Mists of Pandaria (5.0)
+}
+addonTable.TeleportsDungeonMistsOfPandaria = {
     [131225] = { type = addonTable.TeleportType.Spell }, -- Path of the Setting Sun (Gate of the Setting Sun)
     [131222] = { type = addonTable.TeleportType.Spell }, -- Path of the Mogu King (Mogu'shan Palace)
     [131232] = { type = addonTable.TeleportType.Spell }, -- Path of the Necromancer (Scholomance)
@@ -127,12 +133,27 @@ addonTable.TeleportsDungeon = {
     [131206] = { type = addonTable.TeleportType.Spell }, -- Path of the Shado-Pan (Shado-Pan Monastery)
     [131205] = { type = addonTable.TeleportType.Spell }, -- Path of the Stout Brew (Stormstout Brewery)
     [131204] = { type = addonTable.TeleportType.Spell }, -- Path of the Jade Serpent (the Temple of the Jade Serpent)
----- Cataclysm (4.0)
+}
+addonTable.TeleportsDungeonCataclysm = {
     [445424] = { type = addonTable.TeleportType.Spell }, -- Path of the Twilight Fortress (Grim Batol)
     [424142] = { type = addonTable.TeleportType.Spell }, -- Path of the Tidehunter (Throne of the Tides)
     [410080] = { type = addonTable.TeleportType.Spell }, -- Path of Wind's Domain (The Vortex Pinnacle)
----- Wrath of the Lich King (3.0)
+}
+addonTable.TeleportsDungeonWrathOfTheLichKing = {
     [1254555] = { type = addonTable.TeleportType.Spell }, -- Path of Unyielding Blight Pit of Saron)
+}
+
+addonTable.TeleportsDungeon = {
+    { expansion = "Midnight", dungeons = addonTable.TeleportsDungeonMidnight },
+    { expansion = "The War Within", dungeons = addonTable.TeleportsDungeonTheWarWithin },
+    { expansion = "Dragonflight", dungeons = addonTable.TeleportsDungeonDragonflight },
+    { expansion = "Shadowlands", dungeons = addonTable.TeleportsDungeonShadowlands },
+    { expansion = "Battle for Azeroth", dungeons = addonTable.TeleportsDungeonBattleForAzeroth },
+    { expansion = "Legion", dungeons = addonTable.TeleportsDungeonLegion },
+    { expansion = "Warlords of Draenor", dungeons = addonTable.TeleportsDungeonWarlordsOfDraenor },
+    { expansion = "Pandaria", dungeons = addonTable.TeleportsDungeonMistsOfPandaria },
+    { expansion = "Cataclysm", dungeons = addonTable.TeleportsDungeonCataclysm },
+    { expansion = "Wrath of the Lich King", dungeons = addonTable.TeleportsDungeonWrathOfTheLichKing },
 }
 
 addonTable.TeleportsRaid = {

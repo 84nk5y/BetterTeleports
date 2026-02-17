@@ -77,6 +77,32 @@
         </Layers>
     </Frame>
 
+    <Frame name="TeleportSeparatorTemplate" virtual="true">
+        <KeyValues>
+            <KeyValue key="layoutIndex" value="1" type="number"/>
+        </KeyValues>
+        <Size x="200" y="24"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Line" atlas="Options_HorizontalDivider" useAtlasSize="false">
+                    <Size x="0" y="8"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="0"/>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="0.3"/>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Text" inherits="GameFontNormalSmallLeft" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                    <Color r="1" g="0.82" b="0"/>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
     <Button name="TeleportButtonTemplate" inherits="SecureActionButtonTemplate" virtual="true">
         <Size x="40" y="40"/>
         <KeyValues>

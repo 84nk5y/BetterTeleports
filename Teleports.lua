@@ -1,11 +1,5 @@
 local addonName, addonTable = ...
 
-local TELEPORT_TYPE = addonTable.TeleportType
-local TELEPORTS_COMMON = addonTable.TeleportsCommon
-local TELEPORTS_SEASON = addonTable.TeleportsSeason
-local TELEPORTS_DUNGEON = addonTable.TeleportsDungeon
-local TELEPORTS_RAID = addonTable.TeleportsRaid
-
 
 TeleportTabMixin = {}
 
@@ -48,6 +42,11 @@ function TeleportPanelMixin:RefreshList()
 
     local container = self.ScrollFrame.ScrollChild
 
+    if not self.separatorPool then
+        self.separatorPool = CreateFramePool("Button", container, "TeleportSeparatorTemplate")
+    end
+    self.separatorPool:ReleaseAll()
+
     if not self.rowPool then
         self.rowPool = CreateFramePool("Frame", container, "HorizontalLayoutFrameTemplate")
     end
@@ -59,9 +58,10 @@ function TeleportPanelMixin:RefreshList()
     self.buttonPool:ReleaseAll()
 
     self:CreateCommonRows()
-
+    self:CreateSeparator("Season")
     self:CreateSeasonRows()
     self:CreateDungeonRows()
+    self:CreateSeparator("Raids")
     self:CreateRaidRows()
 
     container:Layout()
@@ -70,15 +70,26 @@ function TeleportPanelMixin:RefreshList()
     self.ScrollFrame:UpdateScrollChildRect()
 end
 
+function TeleportPanelMixin:CreateSeparator(text)
+    local sep = self.separatorPool:Acquire()
+    sep.layoutIndex = self.rowLayoutIndex
+
+    sep.Text:SetText(text)
+
+    sep:Show()
+
+    self.rowLayoutIndex = self.rowLayoutIndex + 1
+end
+
 function TeleportPanelMixin:CreateCommonRows()
     local class = select(3, UnitClass("player"))
     local rows = {}
     local currentRow = {}
-    for _, data in ipairs(TELEPORTS_COMMON) do
+    for _, data in ipairs(addonTable.TeleportsCommon) do
         local shouldAdd = false
-        if data.type == TELEPORT_TYPE.Class then
+        if data.type == addonTable.TeleportType.Class then
             shouldAdd = (class == data.class)
-        elseif data.type == TELEPORT_TYPE.Toy then
+        elseif data.type == addonTable.TeleportType.Toy then
             shouldAdd = PlayerHasToy(data.id)
         else
             shouldAdd = true
@@ -105,12 +116,17 @@ end
 function TeleportPanelMixin:CreateSeasonRows()
     local rows = {}
     local currentRow = {}
-    for _, id in ipairs(TELEPORTS_SEASON) do
-        local data = TELEPORTS_DUNGEON[id]
-        table.insert(currentRow, {
-            id = id,
-            type = data.type
-        })
+    for _, id in ipairs(addonTable.TeleportsSeason) do
+        local data = nil
+        for _, teleports in ipairs(addonTable.TeleportsDungeon) do
+            data = teleports.dungeons[id]
+            if data then
+                table.insert(currentRow, {
+                    id = id,
+                    type = data.type
+                })
+            end
+        end
         if #currentRow == self.iconsPerRow then
             table.insert(rows, currentRow)
             currentRow = {}
@@ -124,29 +140,33 @@ function TeleportPanelMixin:CreateSeasonRows()
 end
 
 function TeleportPanelMixin:CreateDungeonRows()
-    local rows = {}
-    local currentRow = {}
-    for id, data in pairs(TELEPORTS_DUNGEON) do
-        table.insert(currentRow, {
-            id = id,
-            type = data.type
-        })
-        if #currentRow == self.iconsPerRow then
-            table.insert(rows, currentRow)
-            currentRow = {}
-        end
-    end
-    if #currentRow > 0 then
-        table.insert(rows, currentRow)
-    end
+    for _, teleports in ipairs(addonTable.TeleportsDungeon) do
+        self:CreateSeparator(teleports.expansion)
 
-    self:CreateRows(rows)
+        local rows = {}
+        local currentRow = {}
+        for id, data in pairs(teleports.dungeons) do
+            table.insert(currentRow, {
+                id = id,
+                type = data.type
+            })
+            if #currentRow == self.iconsPerRow then
+                table.insert(rows, currentRow)
+                currentRow = {}
+            end
+        end
+        if #currentRow > 0 then
+            table.insert(rows, currentRow)
+        end
+
+        self:CreateRows(rows)
+    end
 end
 
 function TeleportPanelMixin:CreateRaidRows()
     local rows = {}
     local currentRow = {}
-    for id, data in pairs(TELEPORTS_RAID) do
+    for id, data in pairs(addonTable.TeleportsRaid) do
         if C_SpellBook.IsSpellKnown(id, Enum.SpellBookSpellBank.Player) then
             table.insert(currentRow, {
                 id = id,
@@ -171,11 +191,11 @@ function TeleportPanelMixin:CreateRows(rows)
         row.layoutIndex = self.rowLayoutIndex
 
         for j, teleport in ipairs(rowTeleports) do
-            if teleport.type == TELEPORT_TYPE.Spell then
+            if teleport.type == addonTable.TeleportType.Spell then
                 self:CreateSpellEntry(teleport.id, row, j)
-            elseif teleport.type == TELEPORT_TYPE.Toy then
+            elseif teleport.type == addonTable.TeleportType.Toy then
                 self:CreateToyEntry(teleport.id, row, j)
-            elseif teleport.type == TELEPORT_TYPE.Class then
+            elseif teleport.type == addonTable.TeleportType.Class then
                 self:CreateSpellEntry(teleport.id, row, j)
             end
         end
@@ -234,9 +254,9 @@ end
 function TeleportPanelMixin:CreateEntryHandlers(entry)
     entry:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        self.IconHighlight:Show()
         GameTooltip:SetSpellByID(self.spellID)
         GameTooltip:Show()
+        self.IconHighlight:Show()
     end)
 
     entry:SetScript("OnLeave", function(self)
