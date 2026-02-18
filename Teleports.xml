@@ -75,6 +75,10 @@
                 </FontString>
             </Layer>
         </Layers>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnShow method="OnShow"/>
+        </Scripts>
     </Frame>
 
     <Frame name="TeleportSeparatorTemplate" virtual="true">

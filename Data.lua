@@ -156,6 +156,13 @@ addonTable.TeleportsDungeon = {
     { expansion = "Wrath of the Lich King", dungeons = addonTable.TeleportsDungeonWrathOfTheLichKing },
 }
 
+addonTable.TeleportDungeonLookup = {}
+for _, teleports in ipairs(addonTable.TeleportsDungeon) do
+    for id, data in pairs(teleports.dungeons) do
+        addonTable.TeleportDungeonLookup[id] = data
+    end
+end
+
 addonTable.TeleportsRaid = {
 ---- The War Within (11.0)
     [1226482] = { type = addonTable.TeleportType.Spell }, -- Path of the Full House (the Liberation of Undermine)

@@ -25,20 +25,32 @@ function TeleportTabMixin:OnLoad()
 end
 
 function TeleportTabMixin:OnClick()
-    QuestMapFrame.TeleportPanel:RefreshList()
-
     QuestMapFrame:SetDisplayMode(self.displayMode)
 end
 
 
 TeleportPanelMixin = {}
 
+function TeleportPanelMixin:OnLoad()
+    self.iconsPerRow = 7
+    self.initialized = false
+    self.spellIDToButtons = {}
+
+    self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+    self:SetScript("OnEvent", self.OnEvent)
+end
+
+function TeleportPanelMixin:OnShow()
+    self:RefreshList()
+end
+
 function TeleportPanelMixin:RefreshList()
     if self.initialized then return end
 
     self.initialized = true
-    self.iconsPerRow = 7
     self.rowLayoutIndex = 1
+
+    wipe(self.spellIDToButtons)
 
     local container = self.ScrollFrame.ScrollChild
 
@@ -116,17 +128,10 @@ function TeleportPanelMixin:CreateCommonRows()
 end
 
 function TeleportPanelMixin:CreateSeasonRows()
-    local dungeonLookup = {}
-    for _, teleports in ipairs(addonTable.TeleportsDungeon) do
-        for id, data in pairs(teleports.dungeons) do
-            dungeonLookup[id] = data
-        end
-    end
-
     local rows = {}
     local currentRow = {}
     for _, id in ipairs(addonTable.TeleportsSeason) do
-        local data = dungeonLookup[id]
+        local data = addonTable.TeleportDungeonLookup[id]
         if data then
             table.insert(currentRow, {
                 id = id,
@@ -157,6 +162,7 @@ function TeleportPanelMixin:CreateDungeonRows()
         for id, data in pairs(teleports.dungeons) do
             table.insert(dungeonList, {id = id, type = data.type})
         end
+        table.sort(dungeonList, function(a, b) return a.id < b.id end)
 
         for _, dungeon in ipairs(dungeonList) do
             table.insert(currentRow, {
@@ -181,17 +187,23 @@ end
 function TeleportPanelMixin:CreateRaidRows()
     local rows = {}
     local currentRow = {}
+    local raidList = {}
     for id, data in pairs(addonTable.TeleportsRaid) do
         if C_SpellBook.IsSpellKnown(id, Enum.SpellBookSpellBank.Player) then
-            table.insert(currentRow, {
-                id = id,
-                type = data.type
-            })
+            table.insert(raidList, {id = id, type = data.type})
+        end
+    end
+    table.sort(raidList, function(a, b) return a.id < b.id end)
 
-            if #currentRow == self.iconsPerRow then
-                table.insert(rows, currentRow)
-                currentRow = {}
-            end
+    for _, raid in ipairs(raidList) do
+        table.insert(currentRow, {
+            id = raid.id,
+            type = raid.type
+        })
+
+        if #currentRow == self.iconsPerRow then
+            table.insert(rows, currentRow)
+            currentRow = {}
         end
     end
 
@@ -227,8 +239,8 @@ function TeleportPanelMixin:CreateSpellEntry(spellID, row, layoutIndex)
 
     local entry = self.buttonPool:Acquire()
     entry:SetParent(row)
-    entry.spellID = spellID
     entry.layoutIndex = layoutIndex
+    entry.spellID = spellID
 
     entry.Icon:SetTexture(spellInfo.iconID)
 
@@ -239,7 +251,7 @@ function TeleportPanelMixin:CreateSpellEntry(spellID, row, layoutIndex)
     entry:SetAttribute("type", "spell")
     entry:SetAttribute("spell", entry.spellID)
 
-    self:CreateEntryHandlers(entry)
+    self:SetupButtonHandlers(entry)
 
     entry:Show()
 end
@@ -249,25 +261,24 @@ function TeleportPanelMixin:CreateToyEntry(toyID, row, layoutIndex)
 
     local entry = self.buttonPool:Acquire()
     entry:SetParent(row)
-    entry.spellID = select(2, C_Item.GetItemSpell(itemID))
     entry.layoutIndex = layoutIndex
+    entry.spellID = select(2, C_Item.GetItemSpell(itemID))
 
     entry.Icon:SetTexture(itemIcon)
 
-    local isKnown = PlayerHasToy(itemID)
-    entry.Icon:SetDesaturated(not isKnown)
-
     entry:SetAttribute("spell", nil)
     entry:SetAttribute("type", "item")
-    entry:SetAttribute("item", "item:"..itemID)
+    entry:SetAttribute("item", "item:" .. itemID)
 
-    self:CreateEntryHandlers(entry)
+    self:SetupButtonHandlers(entry)
 
     entry:Show()
 end
 
-local function SetEntryCooldown(entry)
-    local cooldownInfo = C_Spell.GetSpellCooldown(entry.spellID)
+function TeleportPanelMixin:SetEntryCooldown(entry, spellID, cooldownInfo)
+    if not cooldownInfo then
+        cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+    end
     if cooldownInfo and cooldownInfo.startTime > 0 then
         entry.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
     else
@@ -275,8 +286,8 @@ local function SetEntryCooldown(entry)
     end
 end
 
-function TeleportPanelMixin:CreateEntryHandlers(entry)
-    SetEntryCooldown(entry)
+function TeleportPanelMixin:SetupButtonHandlers(entry)
+    self:SetEntryCooldown(entry, entry.spellID)
 
     entry:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -290,11 +301,20 @@ function TeleportPanelMixin:CreateEntryHandlers(entry)
         self.IconHighlight:Hide()
     end)
 
-    entry:UnregisterEvent("SPELL_UPDATE_COOLDOWN")
-    entry:RegisterEvent("SPELL_UPDATE_COOLDOWN")
-    entry:SetScript("OnEvent", function(self, event, spellID)
-        if spellID == self.spellID then
-            SetEntryCooldown(self)
+    if not self.spellIDToButtons[entry.spellID] then
+        self.spellIDToButtons[entry.spellID] = {}
+    end
+    table.insert(self.spellIDToButtons[entry.spellID], entry)
+end
+
+function TeleportPanelMixin:OnEvent(event, spellID)
+    if event == "SPELL_UPDATE_COOLDOWN" then
+        local buttons = self.spellIDToButtons[spellID]
+        if buttons then
+            local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+            for _, button in ipairs(buttons) do
+                self:SetEntryCooldown(button, spellID, cooldownInfo)
+            end
         end
-    end)
+    end
 end
