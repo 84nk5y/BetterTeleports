@@ -35,6 +35,7 @@ function TeleportPanelMixin:OnLoad()
     self.iconsPerRow = 7
     self.initialized = false
     self.spellIDToButtons = {}
+    self.sharedCooldownButtons = {}
 
     self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
     self:SetScript("OnEvent", self.OnEvent)
@@ -51,6 +52,7 @@ function TeleportPanelMixin:RefreshList()
     self.rowLayoutIndex = 1
 
     wipe(self.spellIDToButtons)
+    wipe(self.sharedCooldownButtons)
 
     local container = self.ScrollFrame.ScrollChild
 
@@ -275,19 +277,9 @@ function TeleportPanelMixin:CreateToyEntry(toyID, row, layoutIndex)
     entry:Show()
 end
 
-function TeleportPanelMixin:SetEntryCooldown(entry, spellID, cooldownInfo)
-    if not cooldownInfo then
-        cooldownInfo = C_Spell.GetSpellCooldown(spellID)
-    end
-    if cooldownInfo and cooldownInfo.startTime > 0 then
-        entry.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
-    else
-        entry.Cooldown:Clear()
-    end
-end
-
 function TeleportPanelMixin:SetupButtonHandlers(entry)
-    self:SetEntryCooldown(entry, entry.spellID)
+    local cooldownInfo = C_Spell.GetSpellCooldown(entry.spellID)
+    self:SetEntryCooldown(entry, cooldownInfo)
 
     entry:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -305,15 +297,38 @@ function TeleportPanelMixin:SetupButtonHandlers(entry)
         self.spellIDToButtons[entry.spellID] = {}
     end
     table.insert(self.spellIDToButtons[entry.spellID], entry)
+
+    if self:IsSharedCooldown(entry.spellID) then
+        table.insert(self.sharedCooldownButtons, button)
+    end
+end
+
+function TeleportPanelMixin:IsSharedCooldown(spellID)
+    return addonTable.TeleportDungeonLookup[spellID]
+end
+
+function TeleportPanelMixin:SetEntryCooldown(entry, cooldownInfo)
+    if cooldownInfo and cooldownInfo.startTime > 0 then
+        entry.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
+    else
+        entry.Cooldown:Clear()
+    end
 end
 
 function TeleportPanelMixin:OnEvent(event, spellID)
     if event == "SPELL_UPDATE_COOLDOWN" then
-        local buttons = self.spellIDToButtons[spellID]
-        if buttons then
+        if self:IsSharedCooldown(spellID) then
             local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
-            for _, button in ipairs(buttons) do
-                self:SetEntryCooldown(button, spellID, cooldownInfo)
+            for _, button in ipairs(self.sharedCooldownButtons) do
+                self:SetEntryCooldown(button, cooldownInfo)
+            end
+        else
+            local buttons = self.spellIDToButtons[spellID]
+            if buttons then
+                local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+                for _, button in ipairs(buttons) do
+                    self:SetEntryCooldown(button, cooldownInfo)
+                end
             end
         end
     end
