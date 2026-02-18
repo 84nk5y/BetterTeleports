@@ -5,8 +5,6 @@
 ## Notes: Easier to find teleports
 ## Author: Banksy
 ## RequiredDeps: Blizzard_WorldMap
-## SavedVariables: BTP_SavedVars
 
 Data.lua
 Teleports.xml
-#Dump.lua
