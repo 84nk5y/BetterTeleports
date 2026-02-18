@@ -97,16 +97,19 @@ end
 
 function TeleportPanelMixin:CreateCommonRows()
     local class = select(3, UnitClass("player"))
+    local prof1, prof2 = GetProfessions()
     local rows = {}
     local currentRow = {}
     for _, data in ipairs(addonTable.TeleportsCommon) do
-        local shouldAdd = false
-        if data.type == addonTable.TeleportType.Class then
+        local shouldAdd = true
+        if data.class then
             shouldAdd = (class == data.class)
-        elseif data.type == addonTable.TeleportType.Toy then
+        end
+        if data.prof then
+            shouldAdd = (pro1 == data.prof or prof2 == data.prof)
+        end
+        if shouldAdd and data.type == addonTable.TeleportType.Toy then
             shouldAdd = PlayerHasToy(data.id)
-        else
-            shouldAdd = true
         end
         if shouldAdd then
             table.insert(currentRow, {
@@ -239,6 +242,8 @@ end
 function TeleportPanelMixin:CreateSpellEntry(spellID, row, layoutIndex)
     local spellInfo = C_Spell.GetSpellInfo(spellID)
 
+    if not spellInfo then return end
+
     local entry = self.buttonPool:Acquire()
     entry:SetParent(row)
     entry.layoutIndex = layoutIndex
@@ -260,11 +265,14 @@ end
 
 function TeleportPanelMixin:CreateToyEntry(toyID, row, layoutIndex)
     local itemID, _, itemIcon = C_ToyBox.GetToyInfo(toyID)
+    local spellID = select(2, C_Item.GetItemSpell(toyID))
+
+    if not itemID or not itemIcon or not spellID then return end
 
     local entry = self.buttonPool:Acquire()
     entry:SetParent(row)
     entry.layoutIndex = layoutIndex
-    entry.spellID = select(2, C_Item.GetItemSpell(itemID))
+    entry.spellID = spellID
 
     entry.Icon:SetTexture(itemIcon)
 
