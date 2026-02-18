@@ -178,6 +178,8 @@ end
 function TeleportPanelMixin:CreateCommonRows()
     local class = select(3, UnitClass("player"))
     local prof1, prof2 = GetProfessions()
+    local prof1Name = GetProfessionInfo(prof1)
+    local prof2Name = GetProfessionInfo(prof2)
     local rows = {}
     local currentRow = {}
     for _, data in ipairs(addonTable.TeleportsCommon) do
@@ -186,7 +188,7 @@ function TeleportPanelMixin:CreateCommonRows()
             shouldAdd = (class == data.class)
         end
         if data.prof then
-            shouldAdd = (prof1 == data.prof or prof2 == data.prof)
+            shouldAdd = (prof1Name == data.prof or prof2Name == data.prof)
         end
         if shouldAdd and data.type == addonTable.TeleportType.Toy then
             shouldAdd = PlayerHasToy(data.id)

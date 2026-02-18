@@ -24,22 +24,22 @@ addonTable.TeleportsCommon = {
     { id = 50977, type = addonTable.TeleportType.Class, class = 6 }, -- DK Death Gate
     { id = 193753, type = addonTable.TeleportType.Class, class = 11 }, -- Druid Dreamwalk
 -- WORMHOLES & TRANSPORTERS
-    { id = 221966, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Generator: Khaz Algar (TWW)
-    { id = 198156, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wyrmhole Generator: Dragon Isles (DF)
-    { id = 172924, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Generator: Shadowlands (SL)
-    { id = 168807, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Generator: Zandalar (BfA)
-    { id = 168808, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Generator: Kul Tiras (BfA)
-    { id = 151652, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Generator: Argus (Legion)
-    { id = 112059, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Centrifuge (Draenor)
-    { id = 87215, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Generator: Pandaria (MoP)
-    { id = 48933, type = addonTable.TeleportType.Toy, prof = 8 }, -- Wormhole Generator: Northrend (WotLK)
-    { id = 144341, type = addonTable.TeleportType.Toy, prof = 8 }, -- Rechargeable Reaves Battery (Legion Wormhole)
+    { id = 221966, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Generator: Khaz Algar (TWW)
+    { id = 198156, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wyrmhole Generator: Dragon Isles (DF)
+    { id = 172924, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Generator: Shadowlands (SL)
+    { id = 168807, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Generator: Zandalar (BfA)
+    { id = 168808, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Generator: Kul Tiras (BfA)
+    { id = 151652, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Generator: Argus (Legion)
+    { id = 112059, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Centrifuge (Draenor)
+    { id = 87215, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Generator: Pandaria (MoP)
+    { id = 48933, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Wormhole Generator: Northrend (WotLK)
+    { id = 144341, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Rechargeable Reaves Battery (Legion Wormhole)
 -- CLASSIC GADGETZAN/EVERLOOK TRANSPORTERS (Toys)
-    { id = 18984, type = addonTable.TeleportType.Toy, prof = 8 }, -- Dimensional Ripper - Everlook
-    { id = 18986, type = addonTable.TeleportType.Toy, prof = 8 }, -- Ultrasafe Transporter: Gadgetzan
-    { id = 30542, type = addonTable.TeleportType.Toy, prof = 8 }, -- Dimensional Ripper - Area 52
-    { id = 30544, type = addonTable.TeleportType.Toy, prof = 8 }, -- Ultrasafe Transporter: Toshley's Station
-    { id = 167075, type = addonTable.TeleportType.Toy, prof = 8 }, -- Ultrasafe Transporter: Mechagon
+    { id = 18984, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Dimensional Ripper - Everlook
+    { id = 18986, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Ultrasafe Transporter: Gadgetzan
+    { id = 30542, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Dimensional Ripper - Area 52
+    { id = 30544, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Ultrasafe Transporter: Toshley's Station
+    { id = 167075, type = addonTable.TeleportType.Toy, prof = "Engineering" }, -- Ultrasafe Transporter: Mechagon
 }
 
 addonTable.TeleportsSeason = {
