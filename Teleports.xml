@@ -33,6 +33,16 @@
             <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ContentsAnchor" x="-22"/>
         </Anchors>
         <Frames>
+            <EditBox parentKey="SearchBox" inherits="SearchBoxTemplate" letters="60" mixin="TeleportPanelSearchBoxMixin">
+                <Size x="301" y="20"/>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" x="6" y="7"/>
+                </Anchors>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                    <OnTextChanged method="OnTextChanged"/>
+                </Scripts>
+            </EditBox>
             <Frame parentKey="BorderFrame" inherits="QuestLogBorderFrameTemplate"/>
             <ScrollFrame parentKey="ScrollFrame" inherits="ScrollFrameTemplate">
                 <KeyValues>
@@ -66,15 +76,6 @@
                 </ScrollChild>
             </ScrollFrame>
         </Frames>
-        <Layers>
-            <Layer level="ARTWORK">
-                <FontString parentKey="TitleText" inherits="Game15Font_Shadow" wordwrap="false" text="Teleports">
-                    <Anchors>
-                        <Anchor point="BOTTOM" relativeKey="$parent.BorderFrame" relativePoint="TOP" x="-1" y="3"/>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnShow method="OnShow"/>
