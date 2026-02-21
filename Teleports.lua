@@ -117,6 +117,7 @@ function TeleportPanelMixin:ApplySearch()
 
     local container = self.ScrollFrame.Content
     container:Layout()
+    container:Show()
     self.ScrollFrame:UpdateScrollChildRect()
 end
 
