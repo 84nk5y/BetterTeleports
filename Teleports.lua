@@ -406,7 +406,7 @@ function TeleportPanelMixin:IsSharedCooldown(spellID)
 end
 
 function TeleportPanelMixin:SetEntryCooldown(entry, cooldownInfo)
-    if cooldownInfo and not issecretvalue(cooldownInfo.startTime) and cooldownInfo.startTime > 0 then
+    if cooldownInfo.startTime > 0 then
         entry.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
     else
         entry.Cooldown:Clear()
@@ -414,19 +414,21 @@ function TeleportPanelMixin:SetEntryCooldown(entry, cooldownInfo)
 end
 
 function TeleportPanelMixin:OnEvent(event, spellID)
-    if event == "SPELL_UPDATE_COOLDOWN" then
-        if self:IsSharedCooldown(spellID) then
-            local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
-            for _, button in ipairs(self.sharedCooldownButtons) do
+    if not spellID then return end
+
+    local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+
+    if not cooldownInfo or issecretvalue(cooldownInfo.startTime) then return end
+
+    if self:IsSharedCooldown(spellID) then
+        for _, button in ipairs(self.sharedCooldownButtons) do
+            self:SetEntryCooldown(button, cooldownInfo)
+        end
+    else
+        local buttons = self.spellIDToButtons[spellID]
+        if buttons then
+            for _, button in ipairs(buttons) do
                 self:SetEntryCooldown(button, cooldownInfo)
-            end
-        else
-            local buttons = self.spellIDToButtons[spellID]
-            if buttons then
-                local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
-                for _, button in ipairs(buttons) do
-                    self:SetEntryCooldown(button, cooldownInfo)
-                end
             end
         end
     end
