@@ -178,8 +178,8 @@ end
 function TeleportPanelMixin:CreateCommonRows()
     local class = select(3, UnitClass("player"))
     local prof1, prof2 = GetProfessions()
-    local prof1Name = GetProfessionInfo(prof1)
-    local prof2Name = GetProfessionInfo(prof2)
+    local prof1Name = prof1 and GetProfessionInfo(prof1) or ""
+    local prof2Name = prof2 and GetProfessionInfo(prof2) or ""
     local rows = {}
     local currentRow = {}
     for _, data in ipairs(addonTable.TeleportsCommon) do
@@ -406,7 +406,7 @@ function TeleportPanelMixin:IsSharedCooldown(spellID)
 end
 
 function TeleportPanelMixin:SetEntryCooldown(entry, cooldownInfo)
-    if cooldownInfo and cooldownInfo.startTime > 0 then
+    if cooldownInfo and not issecretvalue(cooldownInfo.startTime) and cooldownInfo.startTime > 0 then
         entry.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
     else
         entry.Cooldown:Clear()
