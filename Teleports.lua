@@ -115,7 +115,7 @@ function TeleportPanelMixin:ApplySearch()
         end
     end
 
-    local container = self.ScrollFrame.ScrollChild
+    local container = self.ScrollFrame.Content
     container:Layout()
     self.ScrollFrame:UpdateScrollChildRect()
 end
@@ -130,7 +130,7 @@ function TeleportPanelMixin:RefreshList()
     wipe(self.sharedCooldownButtons)
     wipe(self.allButtons)
 
-    local container = self.ScrollFrame.ScrollChild
+    local container = self.ScrollFrame.Content
 
     if not self.separatorPool then
         self.separatorPool = CreateFramePool("Button", container, "TeleportSeparatorTemplate")
