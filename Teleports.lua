@@ -353,7 +353,7 @@ end
 function TeleportPanelMixin:CreateToyEntry(toyID, row, layoutIndex)
     local itemID, itemName, itemIcon = C_ToyBox.GetToyInfo(toyID)
     local spellName, spellID = C_Item.GetItemSpell(toyID)
-     local spellDescription = C_Spell.GetSpellDescription(spellID)
+    local spellDescription = spellID and C_Spell.GetSpellDescription(spellID) or nil
 
     if not itemID or not itemIcon or not spellID or not spellDescription then return end
 
