@@ -25,6 +25,7 @@ function TeleportTabMixin:OnLoad()
 end
 
 function TeleportTabMixin:OnClick()
+    QuestMapFrame.TeleportPanel:RefreshList()
     QuestMapFrame:SetDisplayMode(self.displayMode)
 end
 
@@ -56,10 +57,6 @@ function TeleportPanelMixin:OnLoad()
 
     self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
     self:SetScript("OnEvent", self.OnEvent)
-end
-
-function TeleportPanelMixin:OnShow()
-    self:RefreshList()
 end
 
 function TeleportPanelMixin:SetSearchText(text)
