@@ -45,13 +45,13 @@ _A.TeleportsCommon = {
 }
 
 _A.TeleportsSeason = {
+    1254555,
+    159898,
     393273,
     1254572,
     1254559,
     1254563,
-    1254555,
     1254551,
-    1254557,
     1254400,
 }
 
@@ -121,7 +121,6 @@ _A.TeleportsDungeonWarlordsOfDraenor = {
     [159896] = { type = Type.Spell }, -- Path of the Iron Prow (Iron Docks)
     [159899] = { type = Type.Spell }, -- Path of the Crescent Moon (Shadowmoon Burial Grounds)
     [159898] = { type = Type.Spell }, -- Path of the Skies (Skyreach)
-    [1254557] = { type = Type.Spell }, -- Path of the Crowning Pinnacle (Skyreach)
     [159902] = { type = Type.Spell }, -- Path of the Burning Mountain (Upper Blackrock Spire)
 }
 _A.TeleportsDungeonMistsOfPandaria = {
