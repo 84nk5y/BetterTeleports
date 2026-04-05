@@ -44,6 +44,13 @@ _A.TeleportsCommon = {
     { id = 167075, type = Type.Toy, prof = "Engineering" }, -- Ultrasafe Transporter: Mechagon
 }
 
+-- Pre-cache item data for all toys so it's ready when the panel first opens
+for _, data in ipairs(_A.TeleportsCommon) do
+    if data.type == Type.Toy then
+        C_Item.RequestLoadItemDataByID(data.id)
+    end
+end
+
 _A.TeleportsSeason = {
     1254555,
     159898,

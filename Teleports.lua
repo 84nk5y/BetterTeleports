@@ -56,6 +56,7 @@ function TeleportPanelMixin:OnLoad()
     self.searchText = ""
 
     self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+    self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
     self:SetScript("OnEvent", self.OnEvent)
 end
 
@@ -323,7 +324,10 @@ function TeleportPanelMixin:CreateSpellEntry(spellID, row, layoutIndex)
     local spellInfo = C_Spell.GetSpellInfo(spellID)
     local spellDescription = C_Spell.GetSpellDescription(spellID)
 
-    if not spellInfo or not spellDescription then return end
+    if not spellInfo or not spellDescription then
+        self.initialized = false  -- mark for retry
+        return
+    end
 
     local entry = self.buttonPool:Acquire()
     entry:SetParent(row)
@@ -352,7 +356,10 @@ function TeleportPanelMixin:CreateToyEntry(toyID, row, layoutIndex)
     local spellName, spellID = C_Item.GetItemSpell(toyID)
     local spellDescription = spellID and C_Spell.GetSpellDescription(spellID) or nil
 
-    if not itemID or not itemIcon or not spellID or not spellDescription then return end
+    if not itemID or not itemIcon or not spellID or not spellDescription then
+        self.initialized = false  -- mark for retry
+        return
+    end
 
     local entry = self.buttonPool:Acquire()
     entry:SetParent(row)
@@ -412,22 +419,29 @@ function TeleportPanelMixin:SetEntryCooldown(entry, cooldownInfo)
     end
 end
 
-function TeleportPanelMixin:OnEvent(event, spellID)
-    if not spellID then return end
-
-    local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
-
-    if not cooldownInfo or issecretvalue(cooldownInfo.startTime) then return end
-
-    if self:IsSharedCooldown(spellID) then
-        for _, button in ipairs(self.sharedCooldownButtons) do
-            self:SetEntryCooldown(button, cooldownInfo)
+function TeleportPanelMixin:OnEvent(event, ...)
+    if event == "GET_ITEM_INFO_RECEIVED" then
+        if not self.initialized then
+            self:RefreshList()
         end
-    else
-        local buttons = self.spellIDToButtons[spellID]
-        if buttons then
-            for _, button in ipairs(buttons) do
+    elseif event == "SPELL_UPDATE_COOLDOWN" then
+        local spellID = ...
+        if not spellID then return end
+
+        local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+
+        if not cooldownInfo or issecretvalue(cooldownInfo.startTime) then return end
+
+        if self:IsSharedCooldown(spellID) then
+            for _, button in ipairs(self.sharedCooldownButtons) do
                 self:SetEntryCooldown(button, cooldownInfo)
+            end
+        else
+            local buttons = self.spellIDToButtons[spellID]
+            if buttons then
+                for _, button in ipairs(buttons) do
+                    self:SetEntryCooldown(button, cooldownInfo)
+                end
             end
         end
     end
