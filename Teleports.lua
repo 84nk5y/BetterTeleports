@@ -1,5 +1,6 @@
 local _, _A = ...
 
+local TAB_DISPLAY_MODE = 5
 
 TeleportTabMixin = {}
 
@@ -26,7 +27,7 @@ end
 
 function TeleportTabMixin:OnClick()
     QuestMapFrame.TeleportPanel:RefreshList()
-    QuestMapFrame:SetDisplayMode(self.displayMode)
+    QuestMapFrame:SetDisplayMode(TAB_DISPLAY_MODE)
 end
 
 
@@ -384,18 +385,24 @@ function TeleportPanelMixin:SetupButtonHandlers(entry)
     local cooldownInfo = C_Spell.GetSpellCooldown(entry.spellID)
     self:SetEntryCooldown(entry, cooldownInfo)
 
-    entry:SetScript("OnEnter", function(self)
-        GameTooltip:ClearLines()
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetSpellByID(self.spellID)
-        GameTooltip:Show()
-        self.IconHighlight:Show()
-    end)
+    if not entry.hooksAttached then
+        entry:HookScript("OnEnter", function(self)
+            GameTooltip:ClearLines()
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetSpellByID(self.spellID)
+            GameTooltip:Show()
+            self.IconHighlight:Show()
+        end)
 
-    entry:SetScript("OnLeave", function(self)
-        GameTooltip:Hide()
-        self.IconHighlight:Hide()
-    end)
+        entry:HookScript("OnLeave", function(self)
+            if GameTooltip:IsOwned(self) then
+                GameTooltip:Hide()
+            self.IconHighlight:Hide()
+            end
+        end)
+
+        entry.hooksAttached = true
+    end
 
     if not self.spellIDToButtons[entry.spellID] then
         self.spellIDToButtons[entry.spellID] = {}
