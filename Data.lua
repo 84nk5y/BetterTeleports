@@ -18,6 +18,8 @@ _A.TeleportType = {
 local Type = _A.TeleportType
 
 _A.TeleportsCommon = {
+-- ZONE TELEPORTS (Toys)
+    { id = 276371, type = Type.Toy }, -- Lightveil Recall Beacon
 -- SPECIAL HEARTHSTONES (Toys)
     { id = 140192, type = Type.Toy }, -- Dalaran Hearthstone
     { id = 110560, type = Type.Toy }, -- Garrison Hearthstone
