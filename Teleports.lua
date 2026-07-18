@@ -387,6 +387,8 @@ function TeleportPanelMixin:SetupButtonHandlers(entry)
 
     if not entry.hooksAttached then
         entry:HookScript("OnEnter", function(self)
+            if not self:IsVisible() or InCombatLockdown() then return end
+
             GameTooltip:ClearLines()
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetSpellByID(self.spellID)
