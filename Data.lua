@@ -54,14 +54,14 @@ for _, data in ipairs(_A.TeleportsCommon) do
 end
 
 _A.TeleportsSeason = {
-    1254555,
-    159898,
-    393273,
-    1254572,
-    1254559,
-    1254563,
-    1254551,
-    1254400,
+    1286809,
+    1286807,
+    1286801,
+    1286804,
+    1286812,
+    393256,
+    1286828,
+    1286831,
 }
 
 _A.TeleportsDungeonMidnight = {
@@ -69,6 +69,11 @@ _A.TeleportsDungeonMidnight = {
     [1254559] = { type = Type.Spell }, -- Path of the Cavern (Maisara Caverns)
     [1254563] = { type = Type.Spell }, -- Path of the Ethereal (Nexus-Point Xenas)
     [1254400] = { type = Type.Spell }, -- Path of the Fallen (Windrunner Spire)
+    [1286809] = { type = Type.Spell }, -- Path of the Devious Smuggler (Murder Row)
+    [1286807] = { type = Type.Spell }, -- Path of the Worthy Aspirant (Den of Nalorakk)
+    [1286801] = { type = Type.Spell }, -- Path of the Blooming Verdure (The Blinding Vale)
+    [1286804] = { type = Type.Spell }, -- Path of the Brutal Combatant (Voidscar Arena)
+    [1286812] = { type = Type.Spell }, -- Path of Venomous Evolution (Altar of Fangs)
 }
 _A.TeleportsDungeonTheWarWithin = {
     [445417] = { type = Type.Spell }, -- Path of the Ruined City (Ara-Kara, City of Echoes)
@@ -112,6 +117,8 @@ _A.TeleportsDungeonBattleForAzeroth = {
     [motherID] = { type = Type.Spell }, -- Path of the Azerite Refinery (The MOTHERLODE!!)
     [410074] = { type = Type.Spell }, -- Path of Festering Rot (The Underrot)
     [424167] = { type = Type.Spell }, -- Path of Heart's Bane (Waycrest Manor)
+    [1286828] = { type = Type.Spell }, -- Path of the Sacred Temple (Temple of Sethraliss)
+    [1286831] = { type = Type.Spell }, -- Path of the Slumbering Conqueror (Kings' Rest)
 }
 _A.TeleportsDungeonLegion = {
     [424153] = { type = Type.Spell }, -- Path of Ancient Horrors (Black Rook Hold)
