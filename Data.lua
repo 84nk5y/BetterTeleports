@@ -17,7 +17,7 @@ _A.TeleportType = {
 }
 local Type = _A.TeleportType
 
-_A.TeleportsCommon = {
+local TeleportsCommon = {
 -- ZONE TELEPORTS (Toys)
     { id = 276371, type = Type.Toy }, -- Lightveil Recall Beacon
 -- SPECIAL HEARTHSTONES (Toys)
@@ -46,14 +46,10 @@ _A.TeleportsCommon = {
     { id = 167075, type = Type.Toy, prof = "Engineering" }, -- Ultrasafe Transporter: Mechagon
 }
 
--- Pre-cache item data for all toys so it's ready when the panel first opens
-for _, data in ipairs(_A.TeleportsCommon) do
-    if data.type == Type.Toy then
-        C_Item.RequestLoadItemDataByID(data.id)
-    end
-end
+-- Populated at PLAYER_ENTERING_WORLD based on character
+_A.TeleportsCommon = {}
 
-_A.TeleportsSeason = {
+_A.TeleportsDungeonSeason = {
     1286809,
     1286807,
     1286801,
@@ -192,3 +188,78 @@ _A.TeleportsRaid = {
     [373191] = { type = Type.Spell }, -- Path of the Tormented Soul (Sanctum of Domination)
     [373192] = { type = Type.Spell }, -- Path of the First Ones (Sepulcher of the First Ones)
 }
+
+local function ProcessSpell(spellID, data)
+    local spell = Spell:CreateFromSpellID(spellID);
+    spell:ContinueOnSpellLoad(function()
+        data.spellID = spell:GetSpellID()
+        data.spellName = spell:GetSpellName()
+        data.spellDescription = spell:GetSpellDescription()
+        data.spellIcon = spell:GetSpellTexture()
+
+        table.insert(_A.TeleportsCommon, data)
+    end)
+end
+
+local function ProcessToy(toyID, data)
+    local item = Item:CreateFromItemID(toyID)
+    item:ContinueOnItemLoad(function()
+        data.toyID = item:GetItemID()
+        data.toyName = item:GetItemName()
+        data.toyIcon = item:GetItemIcon()
+
+        local _, spellID = C_Item.GetItemSpell(toyID)
+
+        ProcessSpell(spellID, data)
+    end)
+end
+
+local function LoadData()
+    local class = select(3, UnitClass("player"))
+    local prof1, prof2 = GetProfessions()
+    local prof1Name = prof1 and GetProfessionInfo(prof1) or ""
+    local prof2Name = prof2 and GetProfessionInfo(prof2) or ""
+
+    -- load common
+    for _, data in ipairs(TeleportsCommon) do
+        local shouldAdd = true
+        if data.class then
+            shouldAdd = (class == data.class)
+        end
+        if shouldAdd and data.prof then
+            shouldAdd = (prof1Name == data.prof or prof2Name == data.prof)
+        end
+        if shouldAdd and data.type == Type.Toy then
+            shouldAdd = PlayerHasToy(data.id)
+        end
+
+        if shouldAdd then
+            if data.type == Type.Toy then
+                ProcessToy(data.id, data)
+            else
+                ProcessSpell(data.id, data)
+            end
+        end
+    end
+
+    -- load dungeon spells
+    for _, data in pairs(_A.TeleportsDungeon) do
+        for id, _ in pairs(data.dungeons) do
+            C_Spell.RequestLoadSpellData(id)
+        end
+    end
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:SetScript("OnEvent", function(self, event, ...)
+    if event == "PLAYER_ENTERING_WORLD" then
+        local isInitialLogin, isReloadingUi = ...
+        if isInitialLogin or isReloadingUi then
+            LoadData()
+
+            self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        end
+    end
+end)
+

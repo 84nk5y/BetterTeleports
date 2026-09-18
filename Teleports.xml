@@ -78,6 +78,7 @@
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>
+            <OnEvent method="OnEvent"/>
         </Scripts>
     </Frame>
 
@@ -132,7 +133,7 @@
         <Frames>
             <Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" drawEdge="false" useParentLevel="true" hideCountdownNumbers="false">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="2" y="-2"/>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Icon" x="2" y="0"/>
                     <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" x="-2" y="2"/>
                 </Anchors>
             </Cooldown>

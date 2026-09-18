@@ -26,7 +26,9 @@ function TeleportTabMixin:OnLoad()
 end
 
 function TeleportTabMixin:OnClick()
-    QuestMapFrame.TeleportPanel:RefreshList()
+    if IsShiftKeyDown() then self.initialized = false end
+
+    QuestMapFrame.TeleportPanel:TriggerRendering()
     QuestMapFrame:SetDisplayMode(TAB_DISPLAY_MODE)
 end
 
@@ -35,7 +37,7 @@ TeleportPanelSearchBoxMixin = {}
 
 function TeleportPanelSearchBoxMixin:OnLoad()
     SearchBoxTemplate_OnLoad(self)
-    self.Instructions:SetText("Search Teleports");
+    self.Instructions:SetText("Search Teleports")
 end
 
 function TeleportPanelSearchBoxMixin:OnTextChanged()
@@ -50,6 +52,7 @@ TeleportPanelMixin = {}
 
 function TeleportPanelMixin:OnLoad()
     self.iconsPerRow = 7
+    self.renderingPending = false
     self.initialized = false
     self.spellIDToButtons = {}
     self.sharedCooldownButtons = {}
@@ -57,8 +60,6 @@ function TeleportPanelMixin:OnLoad()
     self.searchText = ""
 
     self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
-    self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-    self:SetScript("OnEvent", self.OnEvent)
 end
 
 function TeleportPanelMixin:SetSearchText(text)
@@ -120,7 +121,17 @@ function TeleportPanelMixin:ApplySearch()
     self.ScrollFrame:UpdateScrollChildRect()
 end
 
-function TeleportPanelMixin:RefreshList()
+function TeleportPanelMixin:TriggerRendering()
+    if self.renderingPending then return end
+
+    self.renderingPending = true
+    C_Timer.After(0.1, function()
+        self.renderingPending = false
+        self:RenderListElements()
+    end)
+end
+
+function TeleportPanelMixin:RenderListElements()
     if self.initialized then return end
 
     self.initialized = true
@@ -149,7 +160,7 @@ function TeleportPanelMixin:RefreshList()
 
     self:CreateCommonRows()
     self:CreateSeparator("Season")
-    self:CreateSeasonRows()
+    self:CreateDungeonSeasonRows()
     self:CreateDungeonRows()
     self:CreateSeparator("Raids")
     self:CreateRaidRows()
@@ -161,6 +172,26 @@ function TeleportPanelMixin:RefreshList()
 
     if self.searchText and self.searchText ~= "" then
         self:ApplySearch()
+    end
+end
+
+function TeleportPanelMixin:CreateRows(rows)
+    for _, rowTeleports in ipairs(rows) do
+        local row = self.rowPool:Acquire()
+        row.layoutIndex = self.rowLayoutIndex
+
+        for j, teleport in ipairs(rowTeleports) do
+            if teleport.type == _A.TeleportType.Spell or teleport.type == _A.TeleportType.Class then
+                self:CreateSpellEntry(teleport, row, j)
+            elseif teleport.type == _A.TeleportType.Toy then
+                self:CreateToyEntry(teleport, row, j)
+            end
+        end
+
+        row:Layout()
+        row:Show()
+
+        self.rowLayoutIndex = self.rowLayoutIndex + 1
     end
 end
 
@@ -176,34 +207,18 @@ function TeleportPanelMixin:CreateSeparator(text)
 end
 
 function TeleportPanelMixin:CreateCommonRows()
-    local class = select(3, UnitClass("player"))
-    local prof1, prof2 = GetProfessions()
-    local prof1Name = prof1 and GetProfessionInfo(prof1) or ""
-    local prof2Name = prof2 and GetProfessionInfo(prof2) or ""
     local rows = {}
     local currentRow = {}
     for _, data in ipairs(_A.TeleportsCommon) do
-        local shouldAdd = true
-        if data.class then
-            shouldAdd = (class == data.class)
-        end
-        if data.prof then
-            shouldAdd = (prof1Name == data.prof or prof2Name == data.prof)
-        end
-        if shouldAdd and data.type == _A.TeleportType.Toy then
-            shouldAdd = PlayerHasToy(data.id)
-        end
-        if shouldAdd then
-            table.insert(currentRow, {
-                id = data.id,
-                type = data.type,
-                class = data.class
-            })
+        table.insert(currentRow, {
+            id = data.id,
+            type = data.type,
+            teleport = data
+        })
 
-            if #currentRow == self.iconsPerRow then
-                table.insert(rows, currentRow)
-                currentRow = {}
-            end
+        if #currentRow == self.iconsPerRow then
+            table.insert(rows, currentRow)
+            currentRow = {}
         end
     end
 
@@ -214,10 +229,10 @@ function TeleportPanelMixin:CreateCommonRows()
     self:CreateRows(rows)
 end
 
-function TeleportPanelMixin:CreateSeasonRows()
+function TeleportPanelMixin:CreateDungeonSeasonRows()
     local rows = {}
     local currentRow = {}
-    for _, id in ipairs(_A.TeleportsSeason) do
+    for _, id in ipairs(_A.TeleportsDungeonSeason) do
         local data = _A.TeleportDungeonLookup[id]
         if data then
             table.insert(currentRow, {
@@ -301,42 +316,57 @@ function TeleportPanelMixin:CreateRaidRows()
     self:CreateRows(rows)
 end
 
-function TeleportPanelMixin:CreateRows(rows)
-    for _, rowTeleports in ipairs(rows) do
-        local row = self.rowPool:Acquire()
-        row.layoutIndex = self.rowLayoutIndex
+function TeleportPanelMixin:CreateToyEntry(data, row, layoutIndex)
+    local teleport = data.teleport
 
-        for j, teleport in ipairs(rowTeleports) do
-            if teleport.type == _A.TeleportType.Spell or teleport.type == _A.TeleportType.Class then
-                self:CreateSpellEntry(teleport.id, row, j)
-            elseif teleport.type == _A.TeleportType.Toy then
-                self:CreateToyEntry(teleport.id, row, j)
-            end
-        end
+    local entry = self.buttonPool:Acquire()
+    entry:SetParent(row)
+    entry.layoutIndex = layoutIndex
+    entry.toyID = teleport.toyID
+    entry.spellID = teleport.spellID
+    entry.text = string.lower(teleport.toyName.."/"..teleport.spellName.."/"..teleport.spellDescription)
 
-        row:Layout()
-        row:Show()
+    entry.Icon:SetTexture(teleport.toyIcon)
 
-        self.rowLayoutIndex = self.rowLayoutIndex + 1
-    end
+    entry:SetAttribute("spell", nil)
+    entry:SetAttribute("type", "item")
+    entry:SetAttribute("item", "item:"..entry.toyID)
+
+    self:SetupButtonHandlers(entry)
+
+    entry:Show()
+
+    table.insert(self.allButtons, entry)
 end
 
-function TeleportPanelMixin:CreateSpellEntry(spellID, row, layoutIndex)
-    local spellInfo = C_Spell.GetSpellInfo(spellID)
-    local spellDescription = C_Spell.GetSpellDescription(spellID)
+function TeleportPanelMixin:CreateSpellEntry(data, row, layoutIndex)
+    local teleport = nil
+    if data.teleport then
+        teleport = data.teleport
+    else
+        local spellInfo = C_Spell.GetSpellInfo(data.id)
 
-    if not spellInfo or not spellDescription then
-        self.initialized = false  -- mark for retry
-        return
+        teleport = {}
+        teleport.spellID = data.id
+        teleport.spellName = spellInfo.name
+        teleport.spellIcon = spellInfo.iconID
+        teleport.spellDescription = C_Spell.GetSpellDescription(data.id)
+    end
+
+    if not teleport.spellName or not teleport.spellDescription then
+        self.initialized = false
+
+        self:TriggerRendering()
     end
 
     local entry = self.buttonPool:Acquire()
     entry:SetParent(row)
     entry.layoutIndex = layoutIndex
-    entry.spellID = spellID
-    entry.text = string.lower(spellInfo.name.."/"..spellDescription)
+    entry.toyID = nil
+    entry.spellID = teleport.spellID
+    entry.text = string.lower(teleport.spellName.."/"..teleport.spellDescription)
 
-    entry.Icon:SetTexture(spellInfo.iconID)
+    entry.Icon:SetTexture(teleport.spellIcon)
 
     local isKnown = C_SpellBook.IsSpellKnown(entry.spellID, Enum.SpellBookSpellBank.Player)
     entry.Icon:SetDesaturated(not isKnown)
@@ -352,38 +382,17 @@ function TeleportPanelMixin:CreateSpellEntry(spellID, row, layoutIndex)
     table.insert(self.allButtons, entry)
 end
 
-function TeleportPanelMixin:CreateToyEntry(toyID, row, layoutIndex)
-    local itemID, itemName, itemIcon = C_ToyBox.GetToyInfo(toyID)
-    local spellName, spellID = C_Item.GetItemSpell(toyID)
-    local spellDescription = spellID and C_Spell.GetSpellDescription(spellID) or nil
-
-    if not itemID or not itemIcon or not spellID or not spellDescription then
-        self.initialized = false  -- mark for retry
-        return
-    end
-
-    local entry = self.buttonPool:Acquire()
-    entry:SetParent(row)
-    entry.layoutIndex = layoutIndex
-    entry.spellID = spellID
-    entry.text = string.lower(itemName.."/"..spellName.."/"..spellDescription)
-
-    entry.Icon:SetTexture(itemIcon)
-
-    entry:SetAttribute("spell", nil)
-    entry:SetAttribute("type", "item")
-    entry:SetAttribute("item", "item:" .. itemID)
-
-    self:SetupButtonHandlers(entry)
-
-    entry:Show()
-
-    table.insert(self.allButtons, entry)
-end
-
 function TeleportPanelMixin:SetupButtonHandlers(entry)
-    local cooldownInfo = C_Spell.GetSpellCooldown(entry.spellID)
-    self:SetEntryCooldown(entry, cooldownInfo)
+    self:SetEntryCooldown(entry)
+
+    if not self.spellIDToButtons[entry.spellID] then
+        self.spellIDToButtons[entry.spellID] = {}
+    end
+    table.insert(self.spellIDToButtons[entry.spellID], entry)
+
+    if self:IsSharedCooldown(entry.spellID) then
+        table.insert(self.sharedCooldownButtons, entry)
+    end
 
     if not entry.hooksAttached then
         entry:HookScript("OnEnter", function(self)
@@ -391,7 +400,11 @@ function TeleportPanelMixin:SetupButtonHandlers(entry)
 
             GameTooltip:ClearLines()
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetSpellByID(self.spellID)
+            if self.toyID then
+                GameTooltip:SetToyByItemID(self.toyID)
+            else
+                GameTooltip:SetSpellByID(self.spellID)
+            end
             GameTooltip:Show()
             self.IconHighlight:Show()
         end)
@@ -405,15 +418,6 @@ function TeleportPanelMixin:SetupButtonHandlers(entry)
 
         entry.hooksAttached = true
     end
-
-    if not self.spellIDToButtons[entry.spellID] then
-        self.spellIDToButtons[entry.spellID] = {}
-    end
-    table.insert(self.spellIDToButtons[entry.spellID], entry)
-
-    if self:IsSharedCooldown(entry.spellID) then
-        table.insert(self.sharedCooldownButtons, entry)
-    end
 end
 
 function TeleportPanelMixin:IsSharedCooldown(spellID)
@@ -421,36 +425,36 @@ function TeleportPanelMixin:IsSharedCooldown(spellID)
 end
 
 function TeleportPanelMixin:SetEntryCooldown(entry, cooldownInfo)
-    if cooldownInfo.startTime > 0 then
-        entry.Cooldown:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
+    local start, duration, enable = 0, 0, false
+    if entry.toyID then
+        start, duration, enable = C_Container.GetItemCooldown(entry.toyID)
+    elseif cooldownInfo then
+        start, duration, enable = cooldownInfo.startTime, cooldownInfo.duration, true
     else
-        entry.Cooldown:Clear()
+        local cooldownInfo = C_Spell.GetSpellCooldown(entry.spellID)
+        start, duration, enable = cooldownInfo.startTime, cooldownInfo.duration, true
     end
+
+     CooldownFrame_Set(entry.Cooldown, start, duration, enable)
 end
 
 function TeleportPanelMixin:OnEvent(event, ...)
-    if event == "GET_ITEM_INFO_RECEIVED" then
-        if not self.initialized then
-            self:RefreshList()
+    local spellID = ...
+    if not spellID then return end
+
+    local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
+
+    if not cooldownInfo or issecretvalue(cooldownInfo.startTime) then return end
+
+    if self:IsSharedCooldown(spellID) then
+        for _, button in ipairs(self.sharedCooldownButtons) do
+            self:SetEntryCooldown(button, cooldownInfo)
         end
-    elseif event == "SPELL_UPDATE_COOLDOWN" then
-        local spellID = ...
-        if not spellID then return end
-
-        local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
-
-        if not cooldownInfo or issecretvalue(cooldownInfo.startTime) then return end
-
-        if self:IsSharedCooldown(spellID) then
-            for _, button in ipairs(self.sharedCooldownButtons) do
+    else
+        local buttons = self.spellIDToButtons[spellID]
+        if buttons then
+            for _, button in ipairs(buttons) do
                 self:SetEntryCooldown(button, cooldownInfo)
-            end
-        else
-            local buttons = self.spellIDToButtons[spellID]
-            if buttons then
-                for _, button in ipairs(buttons) do
-                    self:SetEntryCooldown(button, cooldownInfo)
-                end
             end
         end
     end
