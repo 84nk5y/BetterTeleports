@@ -353,10 +353,10 @@ function TeleportPanelMixin:CreateSpellEntry(data, row, layoutIndex)
         teleport.spellDescription = C_Spell.GetSpellDescription(data.id)
     end
 
-    if not teleport.spellName or not teleport.spellDescription then
+    if not teleport or not teleport.spellName or not teleport.spellDescription then
         self.initialized = false
-
         self:TriggerRendering()
+        return
     end
 
     local entry = self.buttonPool:Acquire()
